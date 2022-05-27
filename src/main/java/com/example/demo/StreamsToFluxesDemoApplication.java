@@ -23,6 +23,7 @@ import static com.example.demo.util.AsciiHelper.RESET;
 public class StreamsToFluxesDemoApplication implements CommandLineRunner {
 
     private final CurrencyCalculator currencyCalculator;
+    private final Random random = new Random();
 
     public static void main(String[] args) {
         SpringApplication.run(StreamsToFluxesDemoApplication.class, args);
@@ -32,7 +33,6 @@ public class StreamsToFluxesDemoApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         var start = Instant.now();
-        var random = new Random();
 
         IntStream.range(1, 1000)
                 .map(__ -> random.nextInt(100, 1000))
