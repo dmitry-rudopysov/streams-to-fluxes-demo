@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
 import java.math.BigDecimal;
@@ -22,6 +23,11 @@ public class CurrencyCalculator {
 
     public BigDecimal getRates(Currency currency, BigDecimal rub) {
         return oldDullCurrencyRateProvider.getRate(currency).multiply(rub);
+    }
+
+    public Mono<BigDecimal> getRatesMono(Currency currency, BigDecimal rub) {
+        return newShinyCurrencyRateProvider.getRateMono(currency)
+                .map(rate -> rate.multiply(rub));
     }
 
     public void complete() {
