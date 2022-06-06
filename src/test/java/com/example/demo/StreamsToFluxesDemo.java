@@ -11,6 +11,8 @@ import reactor.core.scheduler.Schedulers;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -89,5 +91,26 @@ public class StreamsToFluxesDemo {
 
 
         Thread.sleep(15000); // Necessary for test only
+    }
+
+    @Test
+    void onErrorContinueDemo() throws Exception {
+
+        Flux.fromStream(IntStream.range(1, 100).boxed())
+                .delayElements(Duration.ofMillis(500))
+                .map(__ -> {
+                    // Sometimes we got error...
+                    if (Instant.now().getEpochSecond() % 3 == 0) {
+                        log.info(RED.getCode() + "It's time to fall! {}" + RESET.getCode(), __);
+                        throw new RuntimeException("It't time to fall!");
+                    }
+                    return __;
+                })
+                .onErrorContinue((t, n) -> log.info(YELLOW.getCode() + "Next number continue {}" + RESET.getCode(), n))
+                .subscribe(result -> log.info(GREEN.getCode() + "Next number is {}" + RESET.getCode(), result),
+                        err -> log.error(RED.getCode() + "Some Error" + RESET.getCode(), err),
+                        () -> log.info("Completed!"));
+
+        Thread.sleep(10000); // Necessary for test only
     }
 }
